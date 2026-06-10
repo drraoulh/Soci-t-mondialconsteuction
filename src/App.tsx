@@ -145,18 +145,27 @@ function App() {
   const page = useMemo(() => getPage(path), [path]);
 
   useEffect(() => {
+    if ("scrollRestoration" in window.history) {
+      window.history.scrollRestoration = "manual";
+    }
+
     const onPopState = () => setPath(normalizePath(window.location.pathname));
     window.addEventListener("popstate", onPopState);
 
     return () => window.removeEventListener("popstate", onPopState);
   }, []);
 
+  useEffect(() => {
+    window.requestAnimationFrame(() => {
+      window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+    });
+  }, [path]);
+
   const navigate = (href: string) => {
     const nextPath = normalizePath(href);
     if (nextPath !== path) {
       window.history.pushState(null, "", nextPath);
       setPath(nextPath);
-      window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
 
